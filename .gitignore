@@ -1,0 +1,16 @@
+# 忽略文件列表
+/DerivedDataCache
+# 忽略可执行文件或编译期间创建的其他文件。
+/Build
+# 忽略可执行文件或编译期间创建的其他文件。
+/Binaries
+# 忽略UnrealBuildTool生成的文件，如Visual Studio项目文件。这些文件可以删除并重新构建。
+/Intermediate
+# 忽略引擎生成的文件，如配置文件和日志。这些文件可以删除并重新构建。
+/Saved
+# 忽略visual项目配置文件
+/.vs
+# 忽略Engine目录中的源文件组织结构
+/Source/Engine
+# 忽略Game - 游戏项目目录中的源文件按模块分组，一个模块一个目录。
+/Source/Game
