@@ -14,3 +14,9 @@
 /Source/Engine
 # 忽略Game - 游戏项目目录中的源文件按模块分组，一个模块一个目录。
 /Source/Game
+# 忽略资源文件
+/Content/Resource
+# 忽略文件
+.gitattributes
+# 忽略文件
+track
