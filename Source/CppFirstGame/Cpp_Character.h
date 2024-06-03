@@ -114,7 +114,7 @@ protected:
 
 	// 转向速度
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float TurnSpeed = 100.f * 6;
+	float TurnSpeed = 100.f;
 
 private:
 	// 处理移动输入
