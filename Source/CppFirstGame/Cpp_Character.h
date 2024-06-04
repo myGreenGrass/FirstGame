@@ -10,6 +10,7 @@
 #include "Engine/StaticMesh.h"
 #include "Blueprint/UserWidget.h"
 
+
 #include "Cpp_Character.generated.h"
 
 // 声明角色类
@@ -134,18 +135,18 @@ public:
 	void CreateHealthBarWidget();
 
 	// 生命条UI的类
-	//UPROPERTY(EditDefaultsOnly, Category = "UI")
-	//TSubclassOf<UUserWidget> HealthBarWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
 	// 攻击HUD的类
-	//UPROPERTY(EditDefaultsOnly, Category = "UI")
-	//TSubclassOf<UUserWidget> AttackHUDWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> AttackHUDWidgetClass;
 
 protected:
 	// 生命条UI
-	//UUserWidget* HealthBarWidget;
+	UUserWidget* HealthBarWidget;
 
 	// 攻击HUD
-	//UPROPERTY(BlueprintReadWrite)
-	//UUserWidget* AttackHUDWidget;
+	UPROPERTY(BlueprintReadWrite)
+	UUserWidget* AttackHUDWidget;
 };

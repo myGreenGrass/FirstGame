@@ -1,4 +1,5 @@
 #include "Cpp_Enemy.h"
+#include "Cpp_WaveSpawnerActor.h"
 
 // 设置默认属性值
 ACpp_Enemy::ACpp_Enemy()
@@ -27,10 +28,21 @@ void ACpp_Enemy::BeginPlay()
     AnimInstance = GetMesh()->GetAnimInstance();
 
 
-    // 添加动画通知开始时的回调函数
-    AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &ACpp_Enemy::OnNotifyBegin);
-    // 添加动画蒙太奇结束时的回调函数
-    AnimInstance->OnMontageEnded.AddDynamic(this, &ACpp_Enemy::OnAttackMontageEnded);
+    // 获取动画实例
+    AnimInstance = GetMesh()->GetAnimInstance();
+
+    if (AnimInstance)
+    {
+        // 添加动画通知开始时的回调函数
+        AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &ACpp_Enemy::OnNotifyBegin);
+        // 添加动画蒙太奇结束时的回调函数
+        AnimInstance->OnMontageEnded.AddDynamic(this, &ACpp_Enemy::OnAttackMontageEnded);
+        UE_LOG(LogTemp, Log, TEXT("AnimInstance initialized and delegates added."));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("AnimInstance is null"));
+    }
 
     // 设置一个计时器来获取AI控制器
     GetWorldTimerManager().SetTimer(TimerHandle_GetAIController, this, &ACpp_Enemy::GetAIController, 0.5f, false);
@@ -172,4 +184,81 @@ void ACpp_Enemy::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
         // 继续追逐玩家
         ChasePlayer();
     }
+}
+
+// 4. 受到玩家的攻击
+float ACpp_Enemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+    Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+    // 减少角色生命值
+    Health -= DamageAmount;
+
+    // 播放受伤声音
+    UGameplayStatics::PlaySoundAtLocation(this, DamageSound, GetActorLocation());
+
+    // 如果生命值小于等于0，处理角色死亡逻辑
+    if (Health <= 0)
+    {
+        Health = 0;
+
+
+
+        // 启用模拟物理
+        GetMesh()->SetSimulatePhysics(true); // 设置模拟物理
+        GetMesh()->SetCollisionProfileName(TEXT("Custom")); // 设置碰撞预设为自定义
+        GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); // 启用查询和物理碰撞
+        GetMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block); // 设置所有碰撞通道的默认响应
+        GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+        GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+        CanAttack = false;
+
+        if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+        {
+            MovementComponent->DisableMovement();
+        }
+
+        GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, this, &ACpp_Enemy::CheckForEnemiesAndDestroy, 3.0f, false);
+
+    }
+    else
+    {
+        // 执行其他受伤逻辑
+        FVector LaunchVelocity = GetActorForwardVector() * -200.0f + GetActorUpVector() * 100.0f;
+        LaunchCharacter(LaunchVelocity, true, true);
+    }
+
+    return DamageAmount;
+}
+
+// 5. 检查敌人是否死亡
+// 死亡则销毁敌人
+void ACpp_Enemy::CheckForEnemiesAndDestroy()
+{
+
+
+    // 查找所有 Cpp_WaveSpawnerActor 类型的对象
+    TArray<AActor*> FoundActors;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACpp_WaveSpawnerActor::StaticClass(), FoundActors);
+
+    if (FoundActors.Num() > 0)
+    {
+        // 取第一个找到的 Cpp_WaveSpawnerActor
+        ACpp_WaveSpawnerActor* FoundEnemy = Cast<ACpp_WaveSpawnerActor>(FoundActors[0]);
+        if (FoundEnemy)
+        {
+            // 调用 CheckForEnemy
+            FoundEnemy->CheckForEnemy();
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to cast FoundActor to AWaveSpawnerActor."));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("No AWaveSpawnerActor found in the world."));
+    }
+    Destroy();
 }

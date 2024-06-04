@@ -45,8 +45,11 @@ public:
 	UFUNCTION()
 	void OnAIMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 
+	// 接受玩家伤害
+	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 	// 检查敌人并摧毁
-	//void CheckForEnemiesAndDestroy();
+	void CheckForEnemiesAndDestroy();
 
 private:
 

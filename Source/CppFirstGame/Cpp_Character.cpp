@@ -29,26 +29,29 @@ ACpp_Character::ACpp_Character()
 	BaseDamage = 10.0f;		// 基础攻击伤害
 	AttackRadius = 25.0f;	// 攻击范围
 	bCanAttack = true;		// 能否攻击
-	MaxHealth = 100.f;		// 最大生命
-	Health = 100.0f; // 设置初始生命值为100
+	MaxHealth = 200.f;		// 最大生命
+	Health = 200.0f; // 设置初始生命值为100
 }
 
 // 开始游戏时或角色生成时调用
 void ACpp_Character::BeginPlay()
 {
+
+	UE_LOG(LogTemp, Warning, TEXT("ACpp_Character::BeginPlay start"));
+
 	Super::BeginPlay();
 
 	// 获取动画实例
 	AnimInstance = GetMesh()->GetAnimInstance();
 
-	// 绑定攻击动画结束时的回调函数
-	AnimInstance->OnMontageEnded.AddDynamic(this, &ACpp_Character::OnAttackMontageEnded);
-
 	// 绑定动画通知开始时的回调函数
 	AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &ACpp_Character::OnNotifyBegin);
 
+	// 绑定攻击动画结束时的回调函数
+	AnimInstance->OnMontageEnded.AddDynamic(this, &ACpp_Character::OnAttackMontageEnded);
+
 	// 创建生命条UI
-	//CreateHealthBarWidget();
+	CreateHealthBarWidget();
 }
 
 void ACpp_Character::Tick(float DeltaTime)
@@ -105,30 +108,33 @@ void ACpp_Character::Attack()
 // 创建生命条UI组件
 void ACpp_Character::CreateHealthBarWidget()
 {
-	//if (HealthBarWidgetClass)
-	//{
-	//	UWorld* World = GetWorld();
-	//	if (World)
-	//	{
-	//		APlayerController* PlayerController = World->GetFirstPlayerController();
-	//		if (PlayerController)
-	//		{
-	//			// 创建生命条UI组件并添加到视口
-	//			HealthBarWidget = CreateWidget<UUserWidget>(World, HealthBarWidgetClass);
-	//			if (HealthBarWidget)
-	//			{
-	//				HealthBarWidget->AddToViewport();
-	//			}
+	UE_LOG(LogTemp, Warning, TEXT("创建UI画面"));
 
-	//			// 创建攻击HUD组件并添加到视口
-	//			AttackHUDWidget = CreateWidget<UUserWidget>(World, AttackHUDWidgetClass);
-	//			if (AttackHUDWidget)
-	//			{
-	//				AttackHUDWidget->AddToViewport();
-	//			}
-	//		}
-	//	}
-	//}
+	if (HealthBarWidgetClass)
+	{
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			APlayerController* PlayerController = World->GetFirstPlayerController();
+			if (PlayerController)
+			{
+				// 创建生命条UI组件并添加到视口
+				HealthBarWidget = CreateWidget<UUserWidget>(World, HealthBarWidgetClass);
+				if (HealthBarWidget)
+				{
+					HealthBarWidget->AddToViewport();
+				}
+
+				// 创建攻击HUD组件并添加到视口
+				AttackHUDWidget = CreateWidget<UUserWidget>(World, AttackHUDWidgetClass);
+				if (AttackHUDWidget)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("创建 AttackHUDWidget"));
+					AttackHUDWidget->AddToViewport();
+				}
+			}
+		}
+	}
 }
 
 // 绑定输入功能
@@ -173,6 +179,7 @@ void ACpp_Character::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupt
 
 void ACpp_Character::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
 {
+	UE_LOG(LogTemp, Warning, TEXT("开始攻击！"));
 	// 获取攻击位置和方向
 	FVector Start = AttackTracePos->GetComponentLocation();
 	FVector ForwardVector = AttackTracePos->GetForwardVector();
