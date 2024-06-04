@@ -20,3 +20,7 @@
 .gitattributes
 # 忽略文件
 track
+
+# 忽略插件生成文件
+/Plugins/PrimitiveFountainPlugin/Binaries
+/Plugins/PrimitiveFountainPlugin/Intermediate
