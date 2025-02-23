@@ -91,6 +91,13 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fountain Settings")
     float LifeTime;
 
+    // 新增发射轴属性，可在蓝图中设置
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fountain Settings")
+    FVector LaunchAxis;
+
+    // 新增发射轴属性，可在蓝图中设置
+    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fountain Settings")
+
 private:
     // 生成粒子函数
     void SpawnParticle();
@@ -100,6 +107,7 @@ private:
 
     // 粒子池数组，用于管理粒子
     TArray<FParticle> ParticlePool;
+
     int ParticlePoolSize;  // 粒子池大小
 
     // 当前粒子的索引
